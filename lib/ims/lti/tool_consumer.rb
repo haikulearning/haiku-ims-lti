@@ -57,9 +57,11 @@ module IMS::LTI
 
       path = uri.path
       path = '/' if path.empty?
+      query_keys = []
       if uri.query && uri.query != ''
         CGI.parse(uri.query).each do |query_key, query_values|
           unless params[query_key]
+            query_keys << query_key
             params[query_key] = query_values.first
           end
         end
@@ -77,7 +79,7 @@ module IMS::LTI
       hash = {}
       request.body.split(/&/).each do |param|
         key, val = param.split(/=/).map { |v| CGI.unescape(v) }
-        hash[key] = val
+        hash[key] = val unless query_keys.include? key
       end
       hash
     end
